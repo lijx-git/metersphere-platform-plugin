@@ -3,15 +3,13 @@ package io.metersphere.platform.utils;
 import io.metersphere.plugin.utils.LogUtil;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class DateUtils {
     public static final String DATE_PATTERM = "yyyy-MM-dd";
     public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String ZONE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 
     public static Date getDate(String dateString) throws Exception {
@@ -23,6 +21,12 @@ public class DateUtils {
         SimpleDateFormat dateFormat = new SimpleDateFormat(TIME_PATTERN);
         return dateFormat.parse(timeString);
     }
+    public static Date getZoneTime(String timeString) throws Exception {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(ZONE_TIME_PATTERN);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.parse(timeString);
+    }
+
 
     public static String getDateString(Date date) throws Exception {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERM);

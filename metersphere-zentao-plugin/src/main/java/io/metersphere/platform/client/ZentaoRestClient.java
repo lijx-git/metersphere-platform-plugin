@@ -374,4 +374,19 @@ public class ZentaoRestClient extends BaseClient {
         ResponseEntity response= restTemplate.exchange(getRestUrl(ZentaoRestApiUrl.ACTIVE_BUG, null), HttpMethod.POST, getJsonHttpEntityWithToken(JSON.toJSONString(jsonObj)), String.class, zentaoKey);
         return response;
     }
+
+    /**
+     * @Description  获取产品bug
+     * @param zentaoKey
+     * @param assignedTo
+     * @return ResponseEntity
+     */
+
+    public Map<String,Object> getProductBugs(int productId) {
+        ObjectNode jsonObj = objectMapper.createObjectNode();
+        String url=getRestUrl(ZentaoRestApiUrl.GET_PRODUCT_BUGS, null);
+        ResponseEntity<Map> response= restTemplate.exchange(url, HttpMethod.GET, getJsonHttpEntityWithToken(JSON.toJSONString(jsonObj)), Map.class, productId,10000);
+        return response.getBody();
+    }
+
 }

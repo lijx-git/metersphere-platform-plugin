@@ -19,5 +19,5 @@ public class ZentaoRestApiUrl {
     public static final String GET_BUILDS = "/projects/{1}/builds";
     public static final String GET_EXECUTIONS = "/projects/{1}/executions";
     public static final String GET_PROJECT_STORIES = "/projects/{1}/stories";
-
+    public static final String GET_PRODUCT_BUGS = "/products/${1}/bugs?limit=${2}&status=all";
 }
