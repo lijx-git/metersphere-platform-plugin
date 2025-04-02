@@ -1,15 +1,14 @@
 
 import io.metersphere.platform.client.BaseZentaoJsonClient;
+import io.metersphere.platform.client.ZentaoGetClient;
 import io.metersphere.platform.client.ZentaoRestClient;
 import io.metersphere.platform.client.ZentaoFactory;
-import io.metersphere.platform.domain.AddIssueResponse;
-import io.metersphere.platform.domain.PlatformRequest;
-import io.metersphere.platform.domain.SelectOption;
-import io.metersphere.platform.domain.ZentaoConfig;
+import io.metersphere.platform.domain.*;
 import io.metersphere.platform.domain.response.rest.ZentaoRestBugDetailResponse;
 import io.metersphere.platform.domain.response.rest.ZentaoRestDemandResponse;
 import io.metersphere.platform.domain.response.rest.ZentaoRestUserResponse;
 import io.metersphere.platform.impl.ZentaoPlatform;
+import io.metersphere.platform.utils.DateUtils;
 import io.metersphere.plugin.utils.JSON;
 import io.metersphere.plugin.utils.LogUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -22,10 +21,19 @@ import org.springframework.util.MultiValueMap;
 import org.testng.annotations.BeforeClass;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static io.metersphere.platform.api.AbstractPlatform.PROXY_PATH;
 
 /**
  * @program: metersphere-platform-plugin
@@ -48,8 +56,9 @@ public class Test {
 
     zentaoConfig.setAccount("admin");
     zentaoConfig.setPassword("Calong@2015");
-    zentaoConfig.setUrl("http://10.1.13.49:80/");
-    zentaoConfig.setRequestType("PATH_INFO");
+    zentaoConfig.setUrl("http://10.1.13.22:80/");
+   // zentaoConfig.setRequestType("PATH_INFO");
+      zentaoConfig.setRequestType("GET");
 
 
     zentaorestClient = new ZentaoRestClient(zentaoConfig.getUrl());
@@ -83,20 +92,37 @@ public class Test {
    @org.testng.annotations.Test
   public void addissue(){
      Map<String, Object> paramMap = new LinkedHashMap<>();
-     paramMap.put("project","2");
-     paramMap.put("title","11测试产品级项目");
-     paramMap.put("product","2");
+     paramMap.put("project","1");
+     paramMap.put("title","测试图片");
+     paramMap.put("product","1");
      paramMap.put("severity","1");
      paramMap.put("pri","1");
      paramMap.put("type","codeerror");
        List<String> list=new ArrayList<>();
-       list.add("主干");
+       list.add("trunk");
        paramMap.put("openedBuild",list);
+       paramMap.put("steps","<img src=\"/file-read-?fileName=28e82891.png\" alt=\"file-read-?fileName=28e82891.png\" /><br /><img src=\"/file-read-?fileName=d3887245.jpg\" alt=\"file-read-?fileName=d3887245.jpg\" />");
+
        System.out.println("addIssue请求参数："+ JSON.toJSONString(paramMap));
-      // AddIssueResponse.Issue issue = zentaorestClient.addIssue(paramMap);
-      // System.out.println("所属项目："+issue.getProject());
-       //System.out.println("issue id："+issue.getId());
+       AddIssueResponse.Issue issue = zentaorestClient.addIssue(paramMap);
+       System.out.println("issue id："+issue.getId());
+
   }
+
+@org.testng.annotations.Test
+public void testms2ZentaoDescription(){
+      String description="![产品定位_副本.png](/resource/md/get?fileName=28e82891.png)![weicha.jpg](/resource/md/get?fileName=d3887245.jpg)";
+      String projectId="1";
+      zentaoPlatform.ms2ZentaoDescription(description,projectId);
+
+}
+@org.testng.annotations.Test
+public void uploadImgJson() throws UnsupportedEncodingException {
+      File file =new File("/opt/metersphere/data/image/markdown" + "/" + URLDecoder.decode("28e82891.png", StandardCharsets.UTF_8.name()));
+    zentaoJsonClient.uploadFile(file, "1");
+}
+
+
 
   @org.testng.annotations.Test
     public void updateIssue(){
@@ -121,8 +147,8 @@ public class Test {
       zentaorestClient.deleteIssue("30");
   }
   @org.testng.annotations.Test
-  public void getbuf(){
-      ZentaoRestBugDetailResponse isuue=zentaorestClient.get("53");
+  public void getbug(){
+      ZentaoRestBugDetailResponse isuue=zentaorestClient.get("2");
       System.out.println(isuue);
   }
   @org.testng.annotations.Test
@@ -137,23 +163,23 @@ public class Test {
   @org.testng.annotations.Test
   public void getBugByProject(){
     Map<String, Object> response = zentaoJsonClient.getBugsByProductId( 1, 200,"1",zentaorestClient);
-    LinkedHashMap<String,LinkedHashMap>  zentaoIssues = (LinkedHashMap<String,LinkedHashMap>) response.get("bugs");
+//      Map<String, Object> response = zentaorestClient.getProductBugs(1);
+      List<Map>  zentaoIssues = (ArrayList<Map>) response.get("bugs");
 
-    List<Map>   issues=new ArrayList<Map>(zentaoIssues.values());
-      System.out.println("数量："+issues.size());
-       issues = issues.stream().filter(map -> ( map.get("project").toString().equals("4"))).collect(Collectors.toList());
+    //List<Map>   issues=new ArrayList<Map>(zentaoIssues);
+      System.out.println("数量："+zentaoIssues.size());
+      zentaoIssues = zentaoIssues.stream().filter(map -> ( map.get("project").toString().equals("4"))).collect(Collectors.toList());
 
 
       //zentaoIssues.forEach((key, value) -> System.out.println("Key = " + key + ", Value = " + value));
-   List<String> allIds = issues.stream().map(i -> i.get("id").toString()).collect(Collectors.toList());
+   List<String> allIds = zentaoIssues.stream().map(i -> i.get("id").toString()).collect(Collectors.toList());
 
-      System.out.println("筛选后的数量:"+issues.size());
+      System.out.println("筛选后的数量:"+zentaoIssues.size());
 
-//
-//    for(String id:allIds){
-//      System.out.println(id);
-//    }
 
+
+
+      System.out.println("筛选后的数量:"+zentaoIssues.size());
   }
   @org.testng.annotations.Test
    public void getsession(){
@@ -246,7 +272,24 @@ public class Test {
 
     @org.testng.annotations.Test
     public void  resolveBug(){
-      zentaorestClient.resolveBug("45","lijx","bydesign");
+      //zentaorestClient.resolveBug("56","lijx");
+    }
+
+    @org.testng.annotations.Test
+    public void testTime() throws Exception {
+        // 用于解析的SimpleDateFormat对象，设置UTC时区
+//        SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+//        iso8601Format.setTimeZone(TimeZone.getTimeZone("UTC"));
+//            // 解析ISO 8601格式的日期字符串
+//        Date date = iso8601Format.parse("2025-03-27T10:34:45Z");
+//        System.out.println(date.getTime());
+//
+//        System.out.println(DateUtils.getTime("2025-03-27 10:34:45").getTime());
+String openedDate="2025-03-27T10:34:45Z";
+        if (StringUtils.isNotBlank(openedDate) && !openedDate.startsWith("0000-00-00"))
+            System.out.println(DateUtils.getZoneTime(openedDate).getTime());
+        else
+            System.out.println("没进啦");
     }
 
 

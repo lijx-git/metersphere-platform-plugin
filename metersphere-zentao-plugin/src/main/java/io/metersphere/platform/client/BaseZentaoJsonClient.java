@@ -183,19 +183,19 @@ public abstract class BaseZentaoJsonClient extends BaseClient {
      * @return 缺陷集合
      */
     public Map<String, Object> getBugsByProductId(Integer pageNum, Integer pageSize, String productId, ZentaoRestClient zentaoRestClient) {
-//        String sessionId = auth();
-//        ResponseEntity<String> response = restTemplate.exchange(requestUrl.getBugList(),
-//                HttpMethod.GET, getHttpEntity(), String.class, projectId, 9999999, pageSize, pageNum, sessionId);
+        String sessionId = auth();
+        ResponseEntity<String> response = restTemplate.exchange(requestUrl.getBugList(),
+                HttpMethod.GET, getHttpEntity(), String.class, productId, 9999999, pageSize, pageNum, sessionId);
 
-        String url=requestUrl.getBugList();
-        ResponseEntity<String> response = restTemplate.exchange(url,
-                HttpMethod.GET,zentaoRestClient.getJsonHttpEntityWithToken(StringUtils.EMPTY), String.class, productId, 99999, pageSize, pageNum);
+//        String url=requestUrl.getBugList();
+//        ResponseEntity<String> response = restTemplate.exchange(url,
+//                HttpMethod.GET,zentaoRestClient.getJsonHttpEntityWithToken(StringUtils.EMPTY), String.class, productId, 99999, pageSize, pageNum);
         try {
             // noinspection unchecked
             return JSON.parseMap(JSON.parseMap(response.getBody()).get("data").toString());
         } catch (Exception e) {
             LogUtil.error(e);
-            MSPluginException.throwException("请检查配置信息是否填写正确！");
+            MSPluginException.throwException("根据产品获取缺陷失败！");
         }
         return null;
     }

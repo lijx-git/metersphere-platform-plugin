@@ -21,5 +21,6 @@ public class ZentaoRestUserResponse extends ZentaoRestBaseResponse {
         private String id;
         private String account;
         private String realname;
+        private String avatar;
     }
 }
