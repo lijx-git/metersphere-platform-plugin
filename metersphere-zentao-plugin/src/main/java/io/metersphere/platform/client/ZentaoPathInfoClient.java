@@ -32,6 +32,7 @@ public class ZentaoPathInfoClient extends BaseZentaoJsonClient {
 
     //private static final String BUG_LIST_URL = "/bug-browse-{1}-0-all-0--{2}-{3}-{4}.json?&zentaosid={5}";
     private static final String BUG_LIST_URL = "/bug-browse-{1}-0-all-0--{2}-{3}-{4}.json";
+    private static final String AJAX_UPLOAD_FILE = "/file-ajaxUpload.json?zentaosid={0}";
 
     public ZentaoPathInfoClient(String url) {
         super(url);
@@ -58,6 +59,7 @@ public class ZentaoPathInfoClient extends BaseZentaoJsonClient {
         request.setProductGet(getUrl(PRODUCT_GET));
         request.setFileDelete(getUrl(FILE_DELETE));
         request.setFileDownload(getUrl(FILE_DOWNLOAD));
+        request.setAjaxUploadFile(getUrl(AJAX_UPLOAD_FILE));
         requestUrl = request;
     }
 

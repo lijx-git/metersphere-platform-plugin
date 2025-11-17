@@ -56,9 +56,9 @@ public class Test {
 
     zentaoConfig.setAccount("admin");
     zentaoConfig.setPassword("Calong@2015");
-    zentaoConfig.setUrl("http://10.1.13.22:80/");
-   // zentaoConfig.setRequestType("PATH_INFO");
-      zentaoConfig.setRequestType("GET");
+    zentaoConfig.setUrl("http://10.1.13.22:8085/");
+    zentaoConfig.setRequestType("PATH_INFO");
+      //zentaoConfig.setRequestType("GET");
 
 
     zentaorestClient = new ZentaoRestClient(zentaoConfig.getUrl());
@@ -116,12 +116,33 @@ public void testms2ZentaoDescription(){
       zentaoPlatform.ms2ZentaoDescription(description,projectId);
 
 }
-@org.testng.annotations.Test
-public void uploadImgJson() throws UnsupportedEncodingException {
-      File file =new File("/opt/metersphere/data/image/markdown" + "/" + URLDecoder.decode("28e82891.png", StandardCharsets.UTF_8.name()));
-    zentaoJsonClient.uploadFile(file, "1");
-}
+/**
+ * @Description 上传单个文件
+ * @param
+ */
 
+@org.testng.annotations.Test
+public void uploadImgJson() {
+    File file = null;
+    try {
+        file = new File("/opt/metersphere/data/image/markdown" + "/" + URLDecoder.decode("28e82891.png", StandardCharsets.UTF_8.name()));
+    } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
+    }
+   String url= zentaoJsonClient.uploadImgFile(file);
+    System.out.println(url);
+}
+    @org.testng.annotations.Test
+    public void uploadFile() {
+        File file = null;
+        try {
+            file = new File("/opt/metersphere/data/image/markdown" + "/" + URLDecoder.decode("28e82891.png", StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        String url= zentaoJsonClient.uploadFile(file,"1");
+        System.out.println(url);
+    }
 
 
   @org.testng.annotations.Test
